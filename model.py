@@ -58,3 +58,31 @@ print(df["Condition"].value_counts())
 
 print("Model distribution:\n")
 print(df["Model"].value_counts())
+
+#Target variable analysis for price distribution
+plt.figure(figsize=(8,6))
+sns.histplot(df["Price"],bins=30,kde=True)
+plt.title("Distribution of Car Prices")
+plt.xlabel("Price")
+plt.ylabel("Frequency")
+
+plt.show()
+
+#Distribution of numerical columns
+numerical_columns=["Year", "Engine Size", "Mileage", "Price"]
+
+for column in numerical_columns:
+    plt.figure(figsize=(8,6))
+    sns.boxplot(data=df[column])
+    plt.title(f"Boxplot of {column}")
+    plt.show()
+
+#Distribution of categorical columns
+categorical_columns=["Brand","Fuel Type","Transmission","Condition","Model"]
+
+for column in categorical_columns:
+    plt.figure(figsize=(8,6))
+    sns.countplot(data=df,x=column)
+    plt.title(f"{column} Distribution")
+    plt.xticks(rotation=45)
+    plt.show()

@@ -2,6 +2,10 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.compose import ColumnTransformer
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
 
 #loading the dataset
 df=pd.read_csv("dataset.csv")
@@ -111,3 +115,31 @@ plt.figure(figsize=(8,6))
 sns.heatmap(df.corr(numeric_only=True),annot=True,cmap="coolwarm")
 plt.title("Correlation Heatmap")
 plt.show()
+
+#Data cleaning
+
+#Dropping the Car ID
+df.drop("Car ID",axis=1,inplace=True)
+
+df=df.dropna() #dropping features with missing values
+
+#creating age of car column
+present_year=2026
+df["Age"]=present_year-df["Year"]
+df.drop("Year",axis=1,inplace=True)
+
+X=df.drop("Price",axis=1)
+y=df["Price"]
+
+#Encoding cateogrical values
+transformers=[("encoder",OneHotEncoder(drop="first",sparse_output=False),
+               ["Brand", "Fuel Type", "Transmission", "Condition", "Model"])]
+
+preprocessor=ColumnTransformer(transformers,remainder="passthrough")
+
+X=preprocessor.fit_transform(X)
+X_train,X_test,y_train,y_test=train_test_split(X,y,test_size=0.2,random_state=42)
+
+scaler=StandardScaler()
+X_train=scaler.fit_transform(X_train)
+X_test=scaler.transform(X_test)

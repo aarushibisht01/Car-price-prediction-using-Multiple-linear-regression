@@ -6,6 +6,8 @@ from sklearn.preprocessing import OneHotEncoder
 from sklearn.compose import ColumnTransformer
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_absolute_error,mean_squared_error,r2_score
 
 #loading the dataset
 df=pd.read_csv("dataset.csv")
@@ -69,8 +71,8 @@ sns.histplot(df["Price"],bins=30,kde=True)
 plt.title("Distribution of Car Prices")
 plt.xlabel("Price")
 plt.ylabel("Frequency")
+plt.savefig("distribustion_of_prices.png", dpi=300, bbox_inches="tight")
 
-plt.show()
 
 #Distribution of numerical columns
 numerical_columns=["Year", "Engine Size", "Mileage", "Price"]
@@ -79,7 +81,8 @@ for column in numerical_columns:
     plt.figure(figsize=(8,6))
     sns.boxplot(data=df[column])
     plt.title(f"Boxplot of {column}")
-    plt.show()
+    plt.savefig(f"{column}_distribution.png", dpi=300, bbox_inches="tight")
+
 
 #Distribution of categorical columns
 categorical_columns=["Brand","Fuel Type","Transmission","Condition","Model"]
@@ -89,7 +92,7 @@ for column in categorical_columns:
     sns.countplot(data=df,x=column)
     plt.title(f"{column} Distribution")
     plt.xticks(rotation=45)
-    plt.show()
+    plt.savefig(f"{column}_distribution.png", dpi=300, bbox_inches="tight")
 
 #Bivariate analysis
 
@@ -99,7 +102,7 @@ for feature in list:
     plt.figure(figsize=(8,6))
     sns.scatterplot(data=df,x=feature,y="Price")
     plt.title(f"{feature} vs Price")
-    plt.show()
+    plt.savefig(f"{feature}_vs_price.png", dpi=300, bbox_inches="tight")
 
 #price by transmission and Fuel type
 list2=["Transmission","Fuel Type"]
@@ -108,13 +111,13 @@ for feature in list2:
     plt.figure(figsize=(8,6))
     sns.boxplot(data=df,x=feature,y="Price")
     plt.title(f"{feature} vs Price")
-    plt.show()
+    plt.savefig(f"{feature}_vs_price.png", dpi=300, bbox_inches="tight")
 
 #collinearity heatmap for multicollinearity check for numerical features
 plt.figure(figsize=(8,6))
 sns.heatmap(df.corr(numeric_only=True),annot=True,cmap="coolwarm")
 plt.title("Correlation Heatmap")
-plt.show()
+plt.savefig("correlation_heatmap.png", dpi=300, bbox_inches="tight")
 
 #Data cleaning
 
@@ -143,3 +146,35 @@ X_train,X_test,y_train,y_test=train_test_split(X,y,test_size=0.2,random_state=42
 scaler=StandardScaler()
 X_train=scaler.fit_transform(X_train)
 X_test=scaler.transform(X_test)
+
+#Model trainig and evaluation
+model=LinearRegression()
+model.fit(X_train, y_train)
+y_predicted=model.predict(X_test)
+
+comparison_df=pd.DataFrame({
+    "Actual Price":y_test,
+    "Predicted Price":y_predicted
+})
+
+print("First 5 rows of comparison dataframe:")
+print(comparison_df.head())
+
+mae=mean_absolute_error(y_test,y_predicted)
+print(f"Mean abosolute error is {mae}")
+
+mse=mean_squared_error(y_test,y_predicted)
+print(f"Mean squared error is {mse}")
+
+rmse=np.sqrt(mse)
+print(f"Root mean squeared error {rmse}")
+
+r2=r2_score(y_test,y_predicted)
+print(f"r2 score is {r2}")
+
+#checking undefitting vs overfitting
+trainig_score=model.score(X_train,y_train)
+testing_score=model.score(X_test,y_test)
+
+print(f"Trainig score R2 i {trainig_score}")
+print(f"Testing score R2 i {testing_score}")

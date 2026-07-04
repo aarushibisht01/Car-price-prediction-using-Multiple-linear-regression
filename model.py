@@ -86,3 +86,28 @@ for column in categorical_columns:
     plt.title(f"{column} Distribution")
     plt.xticks(rotation=45)
     plt.show()
+
+#Bivariate analysis
+
+list=["Mileage","Engine Size"]
+
+for feature in list:
+    plt.figure(figsize=(8,6))
+    sns.scatterplot(data=df,x=feature,y="Price")
+    plt.title(f"{feature} vs Price")
+    plt.show()
+
+#price by transmission and Fuel type
+list2=["Transmission","Fuel Type"]
+
+for feature in list2:
+    plt.figure(figsize=(8,6))
+    sns.boxplot(data=df,x=feature,y="Price")
+    plt.title(f"{feature} vs Price")
+    plt.show()
+
+#collinearity heatmap for multicollinearity check for numerical features
+plt.figure(figsize=(8,6))
+sns.heatmap(df.corr(numeric_only=True),annot=True,cmap="coolwarm")
+plt.title("Correlation Heatmap")
+plt.show()
